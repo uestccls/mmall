@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+
+<generatorConfiguration>
+
+    <!--导入属性配置-->
+    <properties resource="datasource.properties"></properties>
+    <!--指定数据库的jdbc驱动jar包的位置-->
+    <classPathEntry location="${db.driverLocation}"/>
+
+    <context id="default" targetRuntime="MyBatis3" defaultModelType="flat">
+        <property name="autoDelimitKeywords" value="false"/>
+        <!-- 生成的Java文件的编码 -->
+        <property name="javaFileEncoding" value="UTF-8"/>
+        <!-- 格式化Java代码 -->
+        <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter"/>
+        <!-- 格式化xml代码 -->
+        <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
+
+        <!-- beginningDelimiter和endingDelimiter：指明数据库的用于标记数据库对象名的符号，比如ORACLE就是双引号，MYSQL默认是`反引号； -->
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <plugin type="org.mybatis.generator.plugins.SerializablePlugin"/>
+        <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
+
+        <!--optional 在创建class时,对注释进行控制-->
+        <commentGenerator>
+            <!--是否生成注释带时间戳-->
+            <property name="suppressDate" value="true"/>
+            <!-- 是否取消注释 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+
+        <!-- mysql数据库连接 　-->
+        <jdbcConnection driverClass="${db.driverClassName}"
+                        connectionURL="${db.url}"
+                        userId="${db.username}"
+                        password="${db.password}"/>
+
+        <!--&lt;!&ndash;类型处理器,非必须,在数据库类型和java类型之间的转换控制&ndash;&gt;-->
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"></property>
+        </javaTypeResolver>
+
+        <!-- 生成model实体类文件位置
+             用来生成含有主键key的类,纪录类 以及查询example类
+             targetPackage  指定生成的model生成所在的包名
+             targetPackage  指定在该项目下所在的路径-->
+        <javaModelGenerator targetPackage="com.mmall.pojo"
+                            targetProject="src/main/java">
+            <!--是否允许子包,即targetPackage.schemaName.tableName-->
+            <property name="enableSubPackages" value="true"/>
+            <!--是否对model添加构造函数-->
+            <property name="constructorBased" value="true"/>
+            <!--是否对类CHAR类型的列的数据进行trim操作-->
+            <property name="trimStrings" value="true"/>
+            <!--建立的Model对象是否不可改变 即生成的model对象不会有setter方法 只有构造函数-->
+            <property name="immutable" value="false"/>
+        </javaModelGenerator>
+
+        <!--生成mapper.xml配置文件位置 为每一个数据库的表生成对应的sqlmap文件-->
+        <sqlMapGenerator targetPackage="mappers"
+                         targetProject="src/main/resources">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+
+        <!-- 生成mapper接口文件位置
+        targetPackage: mapper接口dao生成位置 -->
+        <javaClientGenerator type="XMLMAPPER" targetPackage="com.mmall.dao"
+                             targetProject="src/main/java" >
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+
+        <!-- 需要生成的实体类对应的表名，多个实体类复制多份该配置即可
+        tableName:数据表的名字  domainObjectName:生成的实体类的类名 -->
+        <table tableName="mmall_cart" domainObjectName="Cart" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <table tableName="mmall_category" domainObjectName="Category" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <table tableName="mmall_order" domainObjectName="Order" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <table tableName="mmall_order_item" domainObjectName="OrderItem" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <table tableName="mmall_pay_info" domainObjectName="PayInfo" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <table tableName="mmall_product" domainObjectName="Product" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+            <columnOverride column="detail" jdbcType="VARCHAR"/>
+            <columnOverride column="sub_images" jdbcType="VARCHAR"/>
+        </table>
+        <table tableName="mmall_shipping" domainObjectName="Shipping" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+        <table tableName="mmall_user" domainObjectName="User" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+    </context>
+</generatorConfiguration>
