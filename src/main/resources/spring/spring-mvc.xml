@@ -20,20 +20,40 @@
         (2)允许使用"/"做整体映射 -->
     <mvc:default-servlet-handler/>
 
-    <!--配置视图解析器-->
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-    <!--配置逻辑视图前缀-->
-    <property name="prefix" value="/html/"/>
-    <!--配置逻辑视图后缀-->
-    <property name="suffix" value=".jsp"/>
-    </bean>
+    <!--&lt;!&ndash;配置视图解析器&ndash;&gt;-->
+    <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">-->
+    <!--&lt;!&ndash;配置逻辑视图前缀&ndash;&gt;-->
+    <!--<property name="prefix" value="/html/"/>-->
+    <!--&lt;!&ndash;配置逻辑视图后缀&ndash;&gt;-->
+    <!--<property name="suffix" value=".jsp"/>-->
+    <!--</bean>-->
+
+    <!--配置responsebody返回使用的字符集-->
+    <mvc:annotation-driven>
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/plain;charset=UTF-8</value>
+                        <value>text/html;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
 
     <!--文件上传-->
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <property name="maxUploadSize" value="10485760"/>   <!--10M-->
-        <property name="maxInMemorySize" value="4096"/>
-        <property name="defaultEncoding" value="UTF-8"/>
-    </bean>
-
+    <!--<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">-->
+        <!--<property name="maxUploadSize" value="10485760"/>   &lt;!&ndash;10M&ndash;&gt;-->
+        <!--<property name="maxInMemorySize" value="4096"/>-->
+        <!--<property name="defaultEncoding" value="UTF-8"/>-->
+    <!--</bean>-->
 
 </beans>
