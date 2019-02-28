@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
 
 /**
- * @description: 封装的对前端的信息返回类
+ * @description: 封装的对前端的信息响应类  并实现序列化接口  以便 http传输
  * @author: cls
  * @create: 2019-02-22 10:54
  **/
@@ -61,25 +61,28 @@ public class ServerResponse<T> implements Serializable{
     }
 
 //    success
-    public static <T> ServerResponse<T> createSuccessData(){
+    public static <T> ServerResponse<T> createSuccess(){
         return new ServerResponse<T>(ResponseCode.SUCCESS.getCode());
     }
     public static <T> ServerResponse<T> createSuccessData(T data){
         return new ServerResponse<T>(ResponseCode.SUCCESS.getCode(),data);
+    }
+    public static <T> ServerResponse<T> createSuccessMsg(String msg){
+        return new ServerResponse<T>(ResponseCode.SUCCESS.getCode(),msg);
     }
     public static <T> ServerResponse<T> createSuccessMsgData(String msg,T data){
         return new ServerResponse<T>(ResponseCode.SUCCESS.getCode(),msg,data);
     }
 
 //    error
-    public static<T> ServerResponse<T> CreateError(){
+    public static<T> ServerResponse<T> createError(){
         return new ServerResponse<T>(ResponseCode.ERROR.getCode(),ResponseCode.ERROR.getInfo());
     }
-    public static<T> ServerResponse<T> CreateErrorMessage(String msg){
+    public static<T> ServerResponse<T> createErrorMessage(String msg){
         return new ServerResponse<T>(ResponseCode.ERROR.getCode(),msg);
     }
-    public static<T> ServerResponse<T> CreateCodeErrorMessage(int errorCode,String msg){
-        return new ServerResponse<T>(errorCode,msg);
+    public static<T> ServerResponse<T> createErrorMessageData(String msg,T data){
+        return new ServerResponse<T>(ResponseCode.ERROR.getCode(),msg,data);
     }
 
 }

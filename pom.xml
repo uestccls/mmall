@@ -207,8 +207,20 @@
       <artifactId>junit</artifactId>
       <version>RELEASE</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.1</version>
+    </dependency>
     <!--end-->
     <!--ssm框架整合的依赖 end-->
+
+    <!--Guava -Caache-->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>24.1-jre</version>
+    </dependency>
 
 
   </dependencies>
