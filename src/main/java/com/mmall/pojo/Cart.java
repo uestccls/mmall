@@ -12,7 +12,7 @@ public class Cart implements Serializable {
 
     private Integer quantity;
 
-    private Integer checked;
+    private Integer checked; //'是否选择,1=已勾选,0=未勾选'
 
     private Date createTime;
 

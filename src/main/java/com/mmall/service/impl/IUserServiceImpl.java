@@ -189,4 +189,18 @@ public class IUserServiceImpl implements IUserService {
         return ServerResponse.createErrorMessage("数据库插入异常，更新失败");
     }
 
+
+
+    // backend
+    public ServerResponse checkAdminRole(User user){
+        if(user==null){
+            return ServerResponse.createNeedLoginMessage("请先登录");
+        }
+        int role=user.getRole();
+        if(role== Const.Role_Admin) {   // 是管理员
+            return ServerResponse.createSuccess();
+        }
+        return ServerResponse.createErrorMessage("该用户不是管理员，无权限操作");
+    }
+
 }

@@ -6,7 +6,7 @@
       <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="parent_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="name" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="status" jdbcType="BIT" javaType="java.lang.Boolean" />
+      <arg column="status" jdbcType="BIT" javaType="java.lang.Integer" />
       <arg column="sort_order" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
       <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
@@ -78,7 +78,7 @@
         now(),
       </if>
       <if test="updateTime != null" >
-        now(),
+        now()
       </if>
     </trim>
   </insert>
@@ -116,4 +116,19 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByParentId" parameterType="int" resultMap="BaseResultMap">
+    SELECT <include refid="Base_Column_List" /> FROM mmall_category
+    WHERE parent_id=#{parentId}
+  </select>
+  <update id="changeCategoryNameById" parameterType="map">
+      UPDATE mmall_category SET name=#{name},update_time=now()
+      where id=#{id}
+  </update>
+  <select id="getDeepCategory" parameterType="int" resultType="java.lang.Integer">
+    select id from mmall_category WHERE id=#{parentId} or parent_id=#{parentId}
+  </select>
+
+
+
 </mapper>

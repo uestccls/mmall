@@ -3,7 +3,7 @@ package com.mmall.pojo;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Shipping implements Serializable {
+public class ShippingAddress implements Serializable {
     private Integer id;
 
     private Integer userId;
@@ -30,7 +30,7 @@ public class Shipping implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public Shipping(Integer id, Integer userId, String receiverName, String receiverPhone, String receiverMobile, String receiverProvince, String receiverCity, String receiverDistrict, String receiverAddress, String receiverZip, Date createTime, Date updateTime) {
+    public ShippingAddress(Integer id, Integer userId, String receiverName, String receiverPhone, String receiverMobile, String receiverProvince, String receiverCity, String receiverDistrict, String receiverAddress, String receiverZip, Date createTime, Date updateTime) {
         this.id = id;
         this.userId = userId;
         this.receiverName = receiverName;
@@ -45,7 +45,7 @@ public class Shipping implements Serializable {
         this.updateTime = updateTime;
     }
 
-    public Shipping() {
+    public ShippingAddress() {
         super();
     }
 

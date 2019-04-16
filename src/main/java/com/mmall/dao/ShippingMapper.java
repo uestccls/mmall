@@ -1,17 +1,17 @@
 package com.mmall.dao;
 
-import com.mmall.pojo.Shipping;
+import com.mmall.pojo.ShippingAddress;
 
 public interface ShippingMapper {
     int deleteByPrimaryKey(Integer id);
 
-    int insert(Shipping record);
+    int insert(ShippingAddress record);
 
-    int insertSelective(Shipping record);
+    int insertSelective(ShippingAddress record);
 
-    Shipping selectByPrimaryKey(Integer id);
+    ShippingAddress selectByPrimaryKey(Integer id);
 
-    int updateByPrimaryKeySelective(Shipping record);
+    int updateByPrimaryKeySelective(ShippingAddress record);
 
-    int updateByPrimaryKey(Shipping record);
+    int updateByPrimaryKey(ShippingAddress record);
 }

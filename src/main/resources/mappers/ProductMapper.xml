@@ -155,9 +155,9 @@
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
-        now(),
-      </if>
+      <!--<if test="updateTime != null" >-->
+        update_time=now()
+      <!--</if>-->
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -173,7 +173,33 @@
       stock = #{stock,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      now()
+      update_time=now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <update id="updateSaleStatus" parameterType="integer">
+    UPDATE mmall_product SET status=#{status}
+    where id=#{id}
+  </update>
+
+  <select id="selectAllProduct" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from mmall_product
+  </select>
+
+  <select id="selectProductByNameAndId" parameterType="map" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from mmall_product
+    <where>
+      <if test="productName != null" >
+        and name like #{productName}
+      </if>
+      <if test="productId != null" >
+        and id=#{productId}
+      </if>
+    </where>
+  </select>
+
+
+
 </mapper>
