@@ -22,5 +22,6 @@ public interface OrderItemMapper {
 
     int batchInsert(@Param("orderItemList") List<OrderItem> orderItemList);
 
+    List<OrderItem> selectByOrderNo(long OrderNo);
 
 }

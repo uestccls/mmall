@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- ch.qos.logback.core.ConsoleAppender 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!--大于debug级别的都会显示-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <property name="log_home" value="G:/神技大学/JAVA/JAVAWEB/mmall/mmallLogFile"></property>
+    <!-- ch.qos.logback.core.rolling.RollingFileAppender 项目 文件日志输出 -->
+    <appender name="mmall" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--日志路径-->
+        <file>${log_home}/mmall-logback.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <fileNamePattern>${log_home}/mmall-logback.%d{yyyy-MM-dd}-%i.gz</fileNamePattern>
+            <maxHistory>10</maxHistory>  <!--最大存储天数-->
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>20MB</MaxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!--日志输出格式-->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ch.qos.logback.core.rolling.RollingFileAppender 异常日志输出 -->
+    <appender name="ERROR"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_home}/mmall-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_home}/mmall-error.%d{yyyy-MM-dd}-%i.gz</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>20MB</MaxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!--日志输出格式-->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+        <!--匹配ERROR级别的level-->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!--设置com.mmall包下的所有使用日志"mmall"、"STDOUT"-->
+    <logger name="com.mmall" level="info" additivity="false">
+        <appender-ref ref="mmall"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+    <!--打印异常错误日志-->
+    <logger name="errorLog" level="error" additivity="false">
+        <appender-ref ref="ERROR" />
+    </logger>
+    <!--打印mybatis日志-->
+    <logger name="com.mmall.dao" level="DEBUG"/>
+
+    <!-- 根节点日志级别 -->
+    <root level="debug">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="mmall"/>
+    </root>
+
+</configuration>

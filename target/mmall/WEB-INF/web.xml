@@ -23,6 +23,29 @@
   </filter-mapping>
   <!-- end  将所有的mapping（/*）拦截到filter 通过filter统一成UTF-8编码-->
 
+  <!-- Spring session -->
+  <!--<filter>-->
+    <!--<filter-name>springSessionRepositoryFilter</filter-name>-->
+    <!--<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>-->
+  <!--</filter>-->
+  <!--<filter-mapping>-->
+    <!--<filter-name>springSessionRepositoryFilter</filter-name>-->
+    <!--<url-pattern>/*</url-pattern>-->
+    <!--<dispatcher>REQUEST</dispatcher>-->
+    <!--<dispatcher>ERROR</dispatcher>-->
+  <!--</filter-mapping>-->
+
+  <!--二期新增，刷新cookie有效期-->
+  <filter>
+    <filter-name>sessionExpireFilter</filter-name>
+    <filter-class>com.mmall.controller.common.sessionExpireFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>sessionExpireFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+
   <!-- Spring配置文件 -->
   <context-param>
     <param-name>contextConfigLocation</param-name>
@@ -51,6 +74,7 @@
     <!-- 默认匹配所有的请求 -->
     <url-pattern>/</url-pattern>
   </servlet-mapping>
+
 
 
 

@@ -4,6 +4,7 @@ import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.dao.*;
 import com.mmall.pojo.*;
+import com.mmall.service.IOrderItemService;
 import com.mmall.service.IOrderService;
 import com.mmall.util.BigDecimalUtil;
 import com.mmall.util.dateConvertUtil;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -41,6 +43,8 @@ public class IOrderServiceImpl implements IOrderService {
     OrderMapper orderMapper;
     @Autowired
     ShippingMapper shippingMapper;
+    @Autowired
+    IOrderItemService iOrderItemService;
 
 
     /**
@@ -248,7 +252,43 @@ public class IOrderServiceImpl implements IOrderService {
         return ServerResponse.createSuccessMsgData("用户订单查询成功",orderVoList);
     }
 
+    /**
+     * @Description:   查询超时、未付款订单
+     * @param
+     * @return: void
+     */
+    public List selectOrderNeedClose(String closeTime){
+        List<Order> list;
+        list=orderMapper.selectOrderNeedClose(closeTime,Const.orderStatusEnum.waitPay.getCode());
+        return list;
+    }
 
+    /**
+     * @Description:  关闭超时订单
+     * @param
+     * @return: void
+     */
+    public void closeOrder(){
+        Date now = new Date();
+        long nowTime=now.getTime();
+        long currentTime = (long)(nowTime - Const.maxOrderWaitPayHours * 60 * 60 * 1000);
+        Date closeDate = new Date(currentTime);
+        List<Order> list=selectOrderNeedClose(dateConvertUtil.dateToString(closeDate,"yyyy-MM-dd HH:mm:ss"));
+        for(Order order:list){
+            List<OrderItem> orderItemList=iOrderItemService.selectByOrderNo(order.getOrderNo());
+            for(OrderItem orderItem:orderItemList){
+                Product product=productMapper.selectByPrimaryKey(orderItem.getProductId());
+                // 产品返回库存
+                int stock=product.getStock()+orderItem.getQuantity();
+                Product newProduct=new Product();
+                newProduct.setId(product.getId());
+                newProduct.setStock(stock);
+                productMapper.updateByPrimaryKeySelective(newProduct);
+            }
+            // 删出订单 (订单状态置为：取消)
+            orderMapper.cancelOrderById(Const.orderStatusEnum.cancel.getCode(),order.getId());
+        }
+    }
 
 
 }

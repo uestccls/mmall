@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @description: token本地缓存，使用guava缓存实现
+ * @description: token本地缓存，使用guava缓存实现   (二期被redis取代了)
  * @author: cls
  **/
 public class TokenCache {

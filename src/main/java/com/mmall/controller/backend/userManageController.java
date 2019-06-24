@@ -5,12 +5,17 @@ import com.mmall.common.ServerResponse;
 import com.mmall.controller.portal.userController;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.util.CookieUtil;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisShardedPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -33,12 +38,14 @@ public class userManageController {
      */
     @RequestMapping(value ="/managerLogin",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> managerLogin(String username, String password, HttpSession session){
+    public ServerResponse<User> managerLogin(HttpServletResponse httpServletResponse,HttpServletRequest httpServletRequest, String username, String password, HttpSession session){
         ServerResponse<User> response=iUserService.login(username,password);
         if(response.isSuccess()){
             int role=response.getData().getRole();
             if(role== Const.Role_Admin){   // 是管理员
-                session.setAttribute(Const.Current_User,response.getData());
+//                session.setAttribute(Const.Current_User,response.getData());
+                CookieUtil.writeLoginToken(httpServletResponse,session.getId());
+                RedisShardedPoolUtil.setEx(session.getId(), JsonUtil.objToString(response.getData()),Const.redis.redisSessionTime);  // 将sessionId-user存入redis
                 return ServerResponse.createSuccessMsgData("管理员登录成功",response.getData());
             }else {
                 return ServerResponse.createErrorMessage("用户密码正确，但是该用户不是管理员，无法进行管理员登录");

@@ -10,6 +10,9 @@ import com.mmall.pojo.Order;
 import com.mmall.pojo.User;
 import com.mmall.service.IPayInfoService;
 import com.mmall.service.IUserService;
+import com.mmall.util.CookieUtil;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisShardedPoolUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +50,11 @@ public class payInfoController {
     @RequestMapping(value = "/pay")
     @ResponseBody
     ServerResponse pay(HttpSession session,HttpServletRequest request,long orderNo) throws IOException {
-        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(request);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         String realPath = request.getSession().getServletContext().getRealPath("/");  //获取项目绝对路径: C:\SOFT\Work\apache-tomcat-8.0.53\webapps\ROOT\
 //        System.out.println(realPath);                                                    //作为二维码存放的位置
         if(user!=null){   // 已经登录
@@ -66,8 +73,13 @@ public class payInfoController {
      */
     @RequestMapping(value = "/queryOrderStatus")
     @ResponseBody
-    ServerResponse queryOrderStatus(HttpSession session,long orderNo){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse queryOrderStatus(HttpSession session,HttpServletRequest httpServletRequest,long orderNo){
+
+        String token=CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user=JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         if(user!=null){   // 已经登录
 
             return iPayInfoService.queryOrderStatus(orderNo);
@@ -128,8 +140,12 @@ public class payInfoController {
      */
     @RequestMapping(value = "/queryOrderPay")
     @ResponseBody
-    ServerResponse queryOrderPay(HttpSession session,long orderNo){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse queryOrderPay(HttpSession session,HttpServletRequest httpServletRequest,long orderNo){
+        String token=CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user=JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         if(user!=null){   // 已经登录
             return iPayInfoService.queryOrderPay(orderNo,user.getId());
         }

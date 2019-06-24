@@ -10,7 +10,10 @@ import com.mmall.pojo.User;
 import com.mmall.service.IFileFTPService;
 import com.mmall.service.IProductService;
 import com.mmall.service.IUserService;
+import com.mmall.util.CookieUtil;
 import com.mmall.util.FtpUtil;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisShardedPoolUtil;
 import com.mmall.vo.ProductListVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,8 +53,12 @@ public class ProductManageController {
      */
     @RequestMapping(value = "/uploadPicture",method = RequestMethod.POST)
     @ResponseBody
-    ServerResponse<Map> uploadFile(HttpSession session, MultipartFile file) throws IOException {
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse<Map> uploadFile(HttpSession session,HttpServletRequest httpServletRequest,MultipartFile file) throws IOException {
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
         if(response.isSuccess()){   // 是管理员
             return iFileFTPService.uploadFile(file);
@@ -68,8 +75,13 @@ public class ProductManageController {
      */
     @RequestMapping(value = "/saveProduct")
     @ResponseBody
-    ServerResponse saveProduct(HttpSession session, Product product){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse saveProduct(HttpSession session,HttpServletRequest httpServletRequest, Product product){
+//        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
         if(response.isSuccess()){   // 是管理员
             return iProductService.addOrUpdateProduct(product);
@@ -87,8 +99,13 @@ public class ProductManageController {
      */
     @RequestMapping(value = "/setSaleStatus")
     @ResponseBody
-    ServerResponse setSaleStatus(HttpSession session, Integer status,Integer productId){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse setSaleStatus(HttpSession session,HttpServletRequest httpServletRequest,Integer status,Integer productId){
+//        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
         if(response.isSuccess()){   // 是管理员
             return iProductService.setSaleStatus(status,productId);
@@ -104,8 +121,13 @@ public class ProductManageController {
      */
     @RequestMapping(value = "/getProductDetail")
     @ResponseBody
-    ServerResponse getProductDetail(HttpSession session,Integer productId){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse getProductDetail(HttpSession session,HttpServletRequest httpServletRequest,Integer productId){
+//        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
         if(response.isSuccess()){   // 是管理员
             return iProductService.getProductDetail(productId);
@@ -122,8 +144,13 @@ public class ProductManageController {
      */
     @RequestMapping(value = "/getProductList")
     @ResponseBody
-    ServerResponse getProductList(HttpSession session,@RequestParam(defaultValue = "1") Integer pageNum,@RequestParam(defaultValue = "5") Integer pageSize){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse getProductList(HttpSession session,HttpServletRequest httpServletRequest,@RequestParam(defaultValue = "1") Integer pageNum,@RequestParam(defaultValue = "5") Integer pageSize){
+//        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
 //        System.out.println(pageNum+"----------------------"+pageSize);
         if(response.isSuccess()){   // 是管理员
@@ -147,8 +174,13 @@ public class ProductManageController {
      */
     @RequestMapping(value = "/searchProduct")
     @ResponseBody
-    ServerResponse searchProduct(HttpSession session,String productName,Integer productId,@RequestParam(defaultValue = "1") Integer pageNum,@RequestParam(defaultValue = "5") Integer pageSize){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse searchProduct(HttpSession session,HttpServletRequest httpServletRequest,String productName,Integer productId,@RequestParam(defaultValue = "1") Integer pageNum,@RequestParam(defaultValue = "5") Integer pageSize){
+//        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
         if(response.isSuccess()){   // 是管理员
             return iProductService.searchProduct(productName,productId,pageNum,pageSize);

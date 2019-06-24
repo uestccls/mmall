@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 加载数据 -->
+    <!--<context:property-placeholder properties-ref="properties" />-->
+    <!--<bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">-->
+        <!--<property name="locations">-->
+            <!--<list>-->
+                <!--<value>classpath:datasource.properties</value>-->
+                <!--<value>classpath:jedis.properties</value>-->
+            <!--</list>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <!-- 使用spring-session把http session放到redis里  -->
+    <bean class="org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration">
+        <!--session有效期 单位：秒    30分钟 -->
+        <property name="maxInactiveIntervalInSeconds" value="1800"/>
+
+    </bean>
+    <!-- 对象池配置 -->
+    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <property name="maxTotal" value="${redis.maxTotal}"/>
+        <property name="maxIdle" value="${redis.maxIdle}"/>
+        <property name="minIdle" value="${redis.minIdle}"/>
+        <property name="testOnBorrow" value="${redis.test.borrow}"/>
+        <property name="testOnReturn" value="${redis.test.return}"/>
+        <property name="blockWhenExhausted" value="${redis.blockWhenExhausted}"/>
+    </bean>
+
+    <bean class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+        <property name="hostName" value="${redis1.ip}" />
+        <property name="port" value="${redis1.port}" />
+        <!--<property name="database" value="0" />-->
+        <property name="poolConfig" ref="jedisPoolConfig"/>
+    </bean>
+
+    <!--设置返回给浏览器的cookie信息-->
+    <bean id="defaultCookieSerializer" class="org.springframework.session.web.http.DefaultCookieSerializer">
+        <property name="cookieName" value="SPRIRNG-SESSION-NAME"/>
+        <!--cookie有效的域名-->
+        <property name="domainName" value=".mmall.com"/>
+        <property name="cookiePath" value="/"/>
+        <!--cookie有效时间，单位：秒   一年-->
+        <property name="cookieMaxAge" value="31536000"/>
+        <property name="useHttpOnlyCookie" value="true"/>
+    </bean>
+
+
+
+</beans>

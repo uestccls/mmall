@@ -4,14 +4,18 @@ import com.mmall.common.Const;
 import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.IUserService;
+import com.mmall.util.CookieUtil;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisShardedPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import javax.servlet.http.HttpSession;
 
-import static com.mmall.common.ServerResponse.createSuccessMsgData;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Controller()
 @RequestMapping("/user")
@@ -35,10 +39,14 @@ public class userController {
        通过适当的转换器转换为指定的格式之后(配置的 MappingJackson2HttpMessageConverter)
        直接写入 HTTP response body 中
     */
-    public ServerResponse<User> login(String username, String password, HttpSession session){
+    public ServerResponse<User> login(String username, String password, HttpSession session,HttpServletResponse httpServletResponse,HttpServletRequest httpServletRequest){
        ServerResponse<User> response=iUserService.login(username,password);
        if(response.isSuccess()){    // 登录成功则将User注入session
-           session.setAttribute(Const.Current_User,response.getData());
+//           session.setAttribute(Const.Current_User,response.getData());
+
+           CookieUtil.writeLoginToken(httpServletResponse,session.getId());
+           RedisShardedPoolUtil.setEx(session.getId(), JsonUtil.objToString(response.getData()),Const.redis.redisSessionTime);  // 将sessionId-user存入redis
+
        }
 //       System.out.println(response);
        return response;
@@ -50,10 +58,11 @@ public class userController {
      */
     @RequestMapping(value ="/logout",method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse logout(HttpSession session){
+    public ServerResponse logout(HttpSession session,HttpServletResponse httpServletResponse,HttpServletRequest httpServletRequest){
 
-        session.removeAttribute(Const.Current_User);  // 清除 当前 session
+//        session.removeAttribute(Const.Current_User);  // 清除 当前 session
 //        session.invalidate();
+        CookieUtil.delLoginToken(httpServletRequest,httpServletResponse);  // 直接删出cookie中的token
         ServerResponse<User> response= ServerResponse.createSuccessMsg("注销成功！");
         return response;
     }
@@ -90,9 +99,15 @@ public class userController {
      */
     @RequestMapping(value="/getUserInfo",method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse<User> getUserInfo(HttpSession session){
-        User user= (User) session.getAttribute(Const.Current_User);
+    public ServerResponse<User> getUserInfo(HttpSession session,HttpServletRequest httpServletRequest){
+        String token=CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user=JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
+//        User user= (User) session.getAttribute(Const.Current_User);
         if(user!=null){
+//            System.out.println(user);
             return ServerResponse.createSuccessMsgData("查询成功",user);
         }else {
             return ServerResponse.createErrorMessage("用户未登录");
@@ -164,15 +179,20 @@ public class userController {
      */
     @RequestMapping(value="/updateUserInfo",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> updateUserInfo(User user,HttpSession session){
-        User currentUser= (User) session.getAttribute(Const.Current_User);
-        if(user==null){
+    public ServerResponse<User> updateUserInfo(User user,HttpSession session,HttpServletRequest httpServletRequest){
+        String token=CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User currentUser=JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
+        if(currentUser==null){
             return ServerResponse.createErrorMessage("用户未登录");
         }
         user.setId(currentUser.getId());  // 保证id不变
         ServerResponse response=iUserService.updateUserInfo(user);
         if(response.isSuccess()){   // 修改成功，则更新session
-            session.setAttribute(Const.Current_User,response.getData());
+//            session.setAttribute(Const.Current_User,response.getData());
+            RedisShardedPoolUtil.setEx(token,JsonUtil.objToString(response.getData()),Const.redis.redisSessionTime); // 更新redis，数据一致性
         }
         return response;
     }

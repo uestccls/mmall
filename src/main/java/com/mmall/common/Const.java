@@ -13,6 +13,9 @@ public class Const {
    public static final int cartProductChecked=1;  // 购物车中商品选中状态
    public static final int cartProductUnChecked=0;  // 未选中状态
 
+   public static final double maxOrderWaitPayHours= 0.5;  // 定时关单时间
+   public static final String redisClosingOrderLock= "redisClosingOrderLock";  // 定时关单redis分布式锁
+
    public static enum orderStatusEnum{
       cancel(0,"cancel"),
       waitPay(10,"waitPay"),
@@ -52,6 +55,14 @@ public class Const {
        String responseFailed="failed";
 
    }
+
+   public interface redis{
+      int redisSessionTime=60*30;  // redis中Session存储有效时间  30分钟 （单位：秒）
+      String token_prefix="token_";
+
+   }
+
+
 
    public static enum pay_platformEnum{
       alipay(1,"zhifubao"),

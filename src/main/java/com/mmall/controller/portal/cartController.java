@@ -5,11 +5,15 @@ import com.mmall.common.ServerResponse;
 import com.mmall.pojo.User;
 import com.mmall.service.ICartService;
 import com.mmall.service.IUserService;
+import com.mmall.util.CookieUtil;
+import com.mmall.util.JsonUtil;
+import com.mmall.util.RedisShardedPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 
@@ -36,8 +40,13 @@ public class cartController {
      */
     @RequestMapping(value = "/addToCart")
     @ResponseBody
-    ServerResponse addToCart(HttpSession session,int productId,int quantity){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse addToCart(HttpSession session, HttpServletRequest httpServletRequest,int productId, int quantity){
+//        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
         if(response.isSuccess()){   // 是管理员
             return iCartService.addToCart(user.getId(),productId,quantity);
@@ -53,8 +62,13 @@ public class cartController {
      */
     @RequestMapping(value = "/chooseCart")
     @ResponseBody
-    ServerResponse chooseCart(HttpSession session,int productId){
-        User user=(User) session.getAttribute(Const.Current_User);
+    ServerResponse chooseCart(HttpSession session, HttpServletRequest httpServletRequest,int productId){
+//        User user=(User) session.getAttribute(Const.Current_User);
+        String token= CookieUtil.readLoginToken(httpServletRequest);
+        if(token==null){
+            return ServerResponse.createErrorMessage("用户未登录");
+        }
+        User user= JsonUtil.stringToObj(RedisShardedPoolUtil.get(token),User.class); // 改为通过session从redis中查询 User
         ServerResponse response=iUserService.checkAdminRole(user);
         if(response.isSuccess()){   // 是管理员
             return iCartService.chooseCart(user.getId(),productId);
