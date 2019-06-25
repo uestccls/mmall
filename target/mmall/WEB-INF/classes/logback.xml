@@ -12,7 +12,7 @@
         </filter>
     </appender>
 
-    <property name="log_home" value="G:/神技大学/JAVA/JAVAWEB/mmall/mmallLogFile"></property>
+    <property name="log_home" value="${CATALINA_HOME}/mmallLogFile"></property>
     <!-- ch.qos.logback.core.rolling.RollingFileAppender 项目 文件日志输出 -->
     <appender name="mmall" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--日志路径-->

@@ -78,7 +78,7 @@ public class CloseOrderTask {
             iOrderService.closeOrder();
             // 释放锁
             String LockTime= RedisShardedPoolUtil.get(Const.redisClosingOrderLock);
-            if(Long.valueOf(LockTime)>System.currentTimeMillis()){   // 锁时间>当前时间，释放锁
+            if(LockTime!=null&&Long.valueOf(LockTime)>System.currentTimeMillis()){   // 锁时间>当前时间，释放锁
                 RedisShardedPoolUtil.del(Const.redisClosingOrderLock);
             }
             logger.info("超时未付款订单已关闭！！！");

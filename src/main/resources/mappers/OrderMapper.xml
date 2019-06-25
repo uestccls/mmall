@@ -224,7 +224,7 @@
 
     <update id="cancelOrderById" parameterType="map">
        update mmall_order
-       SET status=#{status} update_time=now() where id=#{id}
+       SET status=#{status},update_time=now() where id=#{id}
     </update>
 
 
